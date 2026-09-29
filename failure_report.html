@@ -1,0 +1,166 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Python Failure Hunter</title><style>
+*{box-sizing:border-box}body{margin:0;background:#080b10;color:#e7edf6;font:14px Inter,system-ui,sans-serif}.wrap{max-width:1500px;margin:auto;padding:28px}
+header,.stat,.case{background:#11161e;border:1px solid #28303b;border-radius:17px}header{padding:25px}h1{margin:4px 0;font-size:32px}.muted{color:#8e98a8}.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:15px 0}.stat{padding:16px}.num{font-size:27px;font-weight:850}.label{font-size:10px;color:#8e98a8;text-transform:uppercase}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0}input,select{background:#11161e;border:1px solid #303846;color:white;border-radius:10px;padding:11px 13px}
+.case{padding:17px;margin:11px 0}.case.failure{border-color:#743838}.head{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:13px}.badge,.sev,.cat{padding:5px 9px;border-radius:99px;font-size:10px;font-weight:850;background:#252b35}.badge.failure{background:#572020;color:#ffaaaa}.badge.suspicious{background:#554719;color:#ffe18a}.badge.warning{background:#4b3c18;color:#ffd879}.badge.robust{background:#173f2b;color:#8ce0ad}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}h4{font-size:10px;letter-spacing:1px;color:#8d97a7}pre{background:#090c11;border:1px solid #222a35;border-radius:10px;padding:13px;overflow:auto;color:#cbd5e1}p{color:#cbd4df;line-height:1.5}.actual{color:#ffb0b0}.evidence{border-left:3px solid #687383;padding:9px 12px;color:#c7d0dc}summary{cursor:pointer;color:#aebaff}.hidden{display:none}li{margin:8px 0;color:#cbd4df}@media(max-width:900px){.stats{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:1fr}}@media(max-width:500px){.stats{grid-template-columns:repeat(2,1fr)}}
+</style></head><body><div class="wrap">
+<header><div class="muted">PYTHON FAILURE HUNTER</div><h1>calculate_pd()</h1><div class="muted">Adversarial testing · NA · empty structures · arithmetic · types · pandas · NumPy · domain invariants</div></header>
+<div class="stats">
+<div class="stat"><div class="num">10</div><div class="label">Failures</div></div>
+<div class="stat"><div class="num">3</div><div class="label">Suspicious</div></div>
+<div class="stat"><div class="num">4</div><div class="label">Warnings</div></div>
+<div class="stat"><div class="num">1</div><div class="label">Robust</div></div>
+<div class="stat"><div class="num">18</div><div class="label">Cases</div></div>
+<div class="stat"><div class="num">10</div><div class="label">Categories</div></div>
+</div>
+<div class="toolbar"><input id="q" placeholder="Search cases..." oninput="filter()"><select id="r" onchange="filter()"><option value="">All results</option><option>FAILURE</option><option>SUSPICIOUS</option><option>WARNING</option><option>ROBUST</option></select><select id="c" onchange="filter()"><option value="">All categories</option><option>NA / Missing</option><option>Empty DataFrame</option><option>Division by Zero</option><option>Type Mismatch</option><option>Numeric Boundary</option><option>Pandas</option><option>NumPy</option><option>String</option><option>Collection / Shape</option><option>Exceptions</option></select></div>
+<section><article class="case failure" data-cat="NA / Missing" data-result="FAILURE">
+<div class="head"><b>FAIL-001</b><span class="badge failure">FAILURE</span><span class="sev">HIGH</span><span class="cat">NA / Missing</span></div>
+<div class="grid"><div><h4>INPUT</h4><pre>{
+  &quot;customer&quot;: {
+    &quot;rating&quot;: null
+  },
+  &quot;macro_factor&quot;: 1.0
+}</pre></div>
+<div><h4>EXPECTED</h4><p>Missing rating should be validated or handled.</p><h4>OBSERVED</h4><p class="actual">KeyError / invalid lookup caused by None rating.</p></div></div>
+<div class="evidence"><b>Evidence:</b> KeyError / invalid lookup caused by None rating.</div>
+<details><summary>Minimal reproducer</summary><pre>calculate_pd({&#x27;rating&#x27;: None}, 1.0)</pre></details>
+</article><article class="case failure" data-cat="Empty DataFrame" data-result="FAILURE">
+<div class="head"><b>FAIL-002</b><span class="badge failure">FAILURE</span><span class="sev">HIGH</span><span class="cat">Empty DataFrame</span></div>
+<div class="grid"><div><h4>INPUT</h4><pre>pd.DataFrame()</pre></div>
+<div><h4>EXPECTED</h4><p>Empty input should be handled explicitly.</p><h4>OBSERVED</h4><p class="actual">KeyError: expected column &#x27;rating&#x27; is missing.</p></div></div>
+<div class="evidence"><b>Evidence:</b> KeyError: expected column &#x27;rating&#x27; is missing.</div>
+<details><summary>Minimal reproducer</summary><pre>calculate_pd(pd.DataFrame())</pre></details>
+</article><article class="case suspicious" data-cat="Empty DataFrame" data-result="SUSPICIOUS">
+<div class="head"><b>FAIL-003</b><span class="badge suspicious">SUSPICIOUS</span><span class="sev">MEDIUM</span><span class="cat">Empty DataFrame</span></div>
+<div class="grid"><div><h4>INPUT</h4><pre>pd.DataFrame(columns=[&#x27;rating&#x27;])</pre></div>
+<div><h4>EXPECTED</h4><p>Documented empty result.</p><h4>OBSERVED</h4><p class="actual">Reduction/selection may return an unexpected scalar or empty object.</p></div></div>
+<div class="evidence"><b>Evidence:</b> Reduction/selection may return an unexpected scalar or empty object.</div>
+<details><summary>Minimal reproducer</summary><pre>calculate_pd(pd.DataFrame(columns=[&#x27;rating&#x27;]))</pre></details>
+</article><article class="case failure" data-cat="Division by Zero" data-result="FAILURE">
+<div class="head"><b>FAIL-004</b><span class="badge failure">FAILURE</span><span class="sev">HIGH</span><span class="cat">Division by Zero</span></div>
+<div class="grid"><div><h4>INPUT</h4><pre>{
+  &quot;exposure&quot;: 1000,
+  &quot;denominator&quot;: 0
+}</pre></div>
+<div><h4>EXPECTED</h4><p>Zero denominator should be guarded or explicitly defined.</p><h4>OBSERVED</h4><p class="actual">ZeroDivisionError.</p></div></div>
+<div class="evidence"><b>Evidence:</b> ZeroDivisionError.</div>
+<details><summary>Minimal reproducer</summary><pre>calculate_ratio(1000, 0)</pre></details>
+</article><article class="case failure" data-cat="Type Mismatch" data-result="FAILURE">
+<div class="head"><b>FAIL-005</b><span class="badge failure">FAILURE</span><span class="sev">MEDIUM</span><span class="cat">Type Mismatch</span></div>
+<div class="grid"><div><h4>INPUT</h4><pre>{
+  &quot;x&quot;: 1,
+  &quot;y&quot;: &quot;2&quot;
+}</pre></div>
+<div><h4>EXPECTED</h4><p>Inputs should have compatible numeric types or be explicitly converted.</p><h4>OBSERVED</h4><p class="actual">TypeError: unsupported operand types.</p></div></div>
+<div class="evidence"><b>Evidence:</b> TypeError: unsupported operand types.</div>
+<details><summary>Minimal reproducer</summary><pre>calculate_value(1, &#x27;2&#x27;)</pre></details>
+</article><article class="case failure" data-cat="Type Mismatch" data-result="FAILURE">
+<div class="head"><b>FAIL-006</b><span class="badge failure">FAILURE</span><span class="sev">MEDIUM</span><span class="cat">Type Mismatch</span></div>
+<div class="grid"><div><h4>INPUT</h4><pre>{
+  &quot;x&quot;: &quot;2&quot;,
+  &quot;y&quot;: &quot;3&quot;
+}</pre></div>
+<div><h4>EXPECTED</h4><p>String/string arithmetic should either be rejected or explicitly converted.</p><h4>OBSERVED</h4><p class="actual">TypeError for numeric division; concatenation/repetition may occur for other operators.</p></div></div>
+<div class="evidence"><b>Evidence:</b> TypeError for numeric division; concatenation/repetition may occur for other operators.</div>
+<details><summary>Minimal reproducer</summary><pre>calculate_value(&#x27;2&#x27;, &#x27;3&#x27;)</pre></details>
+</article><article class="case warning" data-cat="Type Mismatch" data-result="WARNING">
+<div class="head"><b>FAIL-007</b><span class="badge warning">WARNING</span><span class="sev">MEDIUM</span><span class="cat">Type Mismatch</span></div>
+<div class="grid"><div><h4>INPUT</h4><pre>{
+  &quot;x&quot;: 2,
+  &quot;y&quot;: &quot;3&quot;
+}</pre></div>
+<div><h4>EXPECTED</h4><p>Implicit coercion should be explicit if supported.</p><h4>OBSERVED</h4><p class="actual">Operation behavior depends on operator; Python does not generally coerce numeric strings.</p></div></div>
+<div class="evidence"><b>Evidence:</b> Operation behavior depends on operator; Python does not generally coerce numeric strings.</div>
+<details><summary>Minimal reproducer</summary><pre>calculate_value(2, &#x27;3&#x27;)</pre></details>
+</article><article class="case warning" data-cat="NA / Missing" data-result="WARNING">
+<div class="head"><b>FAIL-008</b><span class="badge warning">WARNING</span><span class="sev">MEDIUM</span><span class="cat">NA / Missing</span></div>
+<div class="grid"><div><h4>INPUT</h4><pre>{
+  &quot;x&quot;: 1,
+  &quot;y&quot;: &quot;np.nan&quot;
+}</pre></div>
+<div><h4>EXPECTED</h4><p>NaN policy should be explicit.</p><h4>OBSERVED</h4><p class="actual">NaN can propagate through arithmetic.</p></div></div>
+<div class="evidence"><b>Evidence:</b> NaN can propagate through arithmetic.</div>
+<details><summary>Minimal reproducer</summary><pre>calculate_value(1, float(&#x27;nan&#x27;))</pre></details>
+</article><article class="case warning" data-cat="NA / Missing" data-result="WARNING">
+<div class="head"><b>FAIL-009</b><span class="badge warning">WARNING</span><span class="sev">MEDIUM</span><span class="cat">NA / Missing</span></div>
+<div class="grid"><div><h4>INPUT</h4><pre>{
+  &quot;x&quot;: &quot;pd.NA&quot;,
+  &quot;y&quot;: 2
+}</pre></div>
+<div><h4>EXPECTED</h4><p>pd.NA should be handled according to the function&#x27;s missing-value policy.</p><h4>OBSERVED</h4><p class="actual">Result may remain pd.NA or raise depending on operation.</p></div></div>
+<div class="evidence"><b>Evidence:</b> Result may remain pd.NA or raise depending on operation.</div>
+<details><summary>Minimal reproducer</summary><pre>calculate_value(pd.NA, 2)</pre></details>
+</article><article class="case failure" data-cat="Numeric Boundary" data-result="FAILURE">
+<div class="head"><b>FAIL-010</b><span class="badge failure">FAILURE</span><span class="sev">HIGH</span><span class="cat">Numeric Boundary</span></div>
+<div class="grid"><div><h4>INPUT</h4><pre>{
+  &quot;pd&quot;: 1.2
+}</pre></div>
+<div><h4>EXPECTED</h4><p>PD must remain within [0,1] if that is the contract.</p><h4>OBSERVED</h4><p class="actual">Returned value outside allowed probability range.</p></div></div>
+<div class="evidence"><b>Evidence:</b> Returned value outside allowed probability range.</div>
+<details><summary>Minimal reproducer</summary><pre>validate_pd(1.2)</pre></details>
+</article><article class="case failure" data-cat="Numeric Boundary" data-result="FAILURE">
+<div class="head"><b>FAIL-011</b><span class="badge failure">FAILURE</span><span class="sev">HIGH</span><span class="cat">Numeric Boundary</span></div>
+<div class="grid"><div><h4>INPUT</h4><pre>{
+  &quot;pd&quot;: -0.1
+}</pre></div>
+<div><h4>EXPECTED</h4><p>PD must not be negative.</p><h4>OBSERVED</h4><p class="actual">Returned value below zero.</p></div></div>
+<div class="evidence"><b>Evidence:</b> Returned value below zero.</div>
+<details><summary>Minimal reproducer</summary><pre>validate_pd(-0.1)</pre></details>
+</article><article class="case warning" data-cat="Pandas" data-result="WARNING">
+<div class="head"><b>FAIL-012</b><span class="badge warning">WARNING</span><span class="sev">MEDIUM</span><span class="cat">Pandas</span></div>
+<div class="grid"><div><h4>INPUT</h4><pre>DataFrame({&#x27;x&#x27;:[1,&#x27;2&#x27;,None]})</pre></div>
+<div><h4>EXPECTED</h4><p>Mixed dtype should be handled explicitly.</p><h4>OBSERVED</h4><p class="actual">object dtype / mixed arithmetic can create errors or silent coercion.</p></div></div>
+<div class="evidence"><b>Evidence:</b> object dtype / mixed arithmetic can create errors or silent coercion.</div>
+<details><summary>Minimal reproducer</summary><pre>transform(pd.DataFrame({&#x27;x&#x27;:[1,&#x27;2&#x27;,None]}))</pre></details>
+</article><article class="case suspicious" data-cat="Pandas" data-result="SUSPICIOUS">
+<div class="head"><b>FAIL-013</b><span class="badge suspicious">SUSPICIOUS</span><span class="sev">MEDIUM</span><span class="cat">Pandas</span></div>
+<div class="grid"><div><h4>INPUT</h4><pre>DataFrame({&#x27;x&#x27;:[1,2]}, index=[0,1]) / Series([10,20], index=[1,2])</pre></div>
+<div><h4>EXPECTED</h4><p>Alignment behavior should be intentional.</p><h4>OBSERVED</h4><p class="actual">Pandas index alignment creates NaN for unmatched labels.</p></div></div>
+<div class="evidence"><b>Evidence:</b> Pandas index alignment creates NaN for unmatched labels.</div>
+<details><summary>Minimal reproducer</summary><pre>transform(df, series)</pre></details>
+</article><article class="case warning" data-cat="NumPy" data-result="WARNING">
+<div class="head"><b>FAIL-014</b><span class="badge warning">WARNING</span><span class="sev">MEDIUM</span><span class="cat">NumPy</span></div>
+<div class="grid"><div><h4>INPUT</h4><pre>np.array([])</pre></div>
+<div><h4>EXPECTED</h4><p>Empty array behavior should be defined.</p><h4>OBSERVED</h4><p class="actual">Reductions such as mean can produce warnings/NaN.</p></div></div>
+<div class="evidence"><b>Evidence:</b> Reductions such as mean can produce warnings/NaN.</div>
+<details><summary>Minimal reproducer</summary><pre>np.mean(np.array([]))</pre></details>
+</article><article class="case warning" data-cat="NumPy" data-result="WARNING">
+<div class="head"><b>FAIL-015</b><span class="badge warning">WARNING</span><span class="sev">MEDIUM</span><span class="cat">NumPy</span></div>
+<div class="grid"><div><h4>INPUT</h4><pre>np.array([1.0,0.0])</pre></div>
+<div><h4>EXPECTED</h4><p>Division should have an explicit zero policy.</p><h4>OBSERVED</h4><p class="actual">np.divide can produce inf/nan plus RuntimeWarning.</p></div></div>
+<div class="evidence"><b>Evidence:</b> np.divide can produce inf/nan plus RuntimeWarning.</div>
+<details><summary>Minimal reproducer</summary><pre>np.divide(1.0, np.array([1.0,0.0]))</pre></details>
+</article><article class="case failure" data-cat="String" data-result="FAILURE">
+<div class="head"><b>FAIL-016</b><span class="badge failure">FAILURE</span><span class="sev">MEDIUM</span><span class="cat">String</span></div>
+<div class="grid"><div><h4>INPUT</h4><pre>{
+  &quot;value&quot;: &quot;&quot;
+}</pre></div>
+<div><h4>EXPECTED</h4><p>Empty string should be validated before conversion.</p><h4>OBSERVED</h4><p class="actual">ValueError during numeric conversion.</p></div></div>
+<div class="evidence"><b>Evidence:</b> ValueError during numeric conversion.</div>
+<details><summary>Minimal reproducer</summary><pre>int(&#x27;&#x27;)</pre></details>
+</article><article class="case failure" data-cat="Collection / Shape" data-result="FAILURE">
+<div class="head"><b>FAIL-017</b><span class="badge failure">FAILURE</span><span class="sev">MEDIUM</span><span class="cat">Collection / Shape</span></div>
+<div class="grid"><div><h4>INPUT</h4><pre>{
+  &quot;x&quot;: [
+    1,
+    2
+  ],
+  &quot;expected&quot;: &quot;scalar&quot;
+}</pre></div>
+<div><h4>EXPECTED</h4><p>Expected scalar should be validated.</p><h4>OBSERVED</h4><p class="actual">Shape/type mismatch.</p></div></div>
+<div class="evidence"><b>Evidence:</b> Shape/type mismatch.</div>
+<details><summary>Minimal reproducer</summary><pre>calculate_value([1,2])</pre></details>
+</article><article class="case warning" data-cat="Exceptions" data-result="WARNING">
+<div class="head"><b>FAIL-018</b><span class="badge warning">WARNING</span><span class="sev">HIGH</span><span class="cat">Exceptions</span></div>
+<div class="grid"><div><h4>INPUT</h4><pre>Input that triggers broad except Exception</pre></div>
+<div><h4>EXPECTED</h4><p>Unexpected exceptions should not be silently swallowed.</p><h4>OBSERVED</h4><p class="actual">Potential failure hidden by broad exception handling.</p></div></div>
+<div class="evidence"><b>Evidence:</b> Potential failure hidden by broad exception handling.</div>
+<details><summary>Minimal reproducer</summary><pre>run_with_fallback(bad_input)</pre></details>
+</article></section>
+<header><h2>Hardening recommendations</h2><ul><li>Add an explicit NA policy for None, np.nan, pd.NA and NaT.</li><li>Guard every denominator or define zero-denominator behavior.</li><li>Validate numeric types before arithmetic.</li><li>Test empty DataFrames with and without expected columns.</li><li>Test pandas alignment with mismatched indexes and columns.</li><li>Check dtype and shape after pandas/NumPy transformations.</li><li>Reject or explicitly convert numeric-looking strings.</li><li>Enforce domain invariants such as probabilities remaining in [0,1].</li></ul></header>
+</div><script>
+function filter(){const q=document.getElementById('q').value.toLowerCase(),r=document.getElementById('r').value,c=document.getElementById('c').value;
+document.querySelectorAll('.case').forEach(x=>x.classList.toggle('hidden',(q&&!x.innerText.toLowerCase().includes(q))||(r&&x.dataset.result!==r)||(c&&x.dataset.cat!==c)));}
+</script></body></html>
