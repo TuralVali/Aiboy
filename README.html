@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Environment Setup Agent</title>
+<style>
+:root {
+  --bg: #0b1020;
+  --panel: #121a2d;
+  --panel2: #18223a;
+  --text: #edf2ff;
+  --muted: #9eabc7;
+  --accent: #7c9cff;
+  --green: #4ade80;
+  --border: #293653;
+  --code: #0a0f1c;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top right, #182650 0, var(--bg) 42%);
+  color: var(--text);
+  line-height: 1.6;
+}
+.container { max-width: 1100px; margin: auto; padding: 48px 24px 80px; }
+.hero {
+  padding: 42px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: linear-gradient(145deg, rgba(124,156,255,.14), rgba(18,26,45,.92));
+  box-shadow: 0 25px 80px rgba(0,0,0,.28);
+}
+.badge {
+  display: inline-block;
+  padding: 6px 11px;
+  border: 1px solid #38508b;
+  border-radius: 999px;
+  color: #b9c8ff;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+h1 { font-size: clamp(34px, 6vw, 62px); line-height: 1.05; margin: 0 0 18px; }
+h2 { margin-top: 48px; font-size: 28px; }
+h3 { color: #c9d5f7; margin-top: 28px; }
+.lead { color: var(--muted); font-size: 18px; max-width: 760px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+.card {
+  background: rgba(18,26,45,.82);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px;
+}
+.card strong { display: block; margin-bottom: 7px; }
+.number {
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+pre {
+  background: var(--code);
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: 14px;
+  overflow-x: auto;
+  color: #dce6ff;
+}
+code { font-family: "SFMono-Regular", Consolas, monospace; }
+.flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin: 24px 0;
+}
+.step {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  padding: 12px 16px;
+  border-radius: 12px;
+}
+.arrow { color: var(--accent); font-weight: 800; }
+.ok { color: var(--green); }
+footer {
+  margin-top: 60px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<section class="hero">
+  <div class="badge">VS Code · GitHub Copilot Agent</div>
+  <h1>Python Environment Setup Agent</h1>
+  <p class="lead">
+    Give the agent a repository path. It prepares the Python virtual environment,
+    installs requirements, handles optional packages, and validates the resulting environment.
+  </p>
+</section>
+
+<h2>What the agent does</h2>
+<div class="grid">
+  <div class="card"><span class="number">01</span><strong>Repository detection</strong>Validates the folder and inspects common Python project files.</div>
+  <div class="card"><span class="number">02</span><strong>Virtual environment</strong>Creates a local <code>.venv</code>, or another name you provide.</div>
+  <div class="card"><span class="number">03</span><strong>Dependencies</strong>Installs packages from <code>requirements.txt</code>.</div>
+  <div class="card"><span class="number">04</span><strong>Extra packages</strong>Lets you add packages such as <code>pyarrow</code>, <code>pandera</code>, or <code>plotly</code>.</div>
+  <div class="card"><span class="number">05</span><strong>Validation</strong>Runs <code>pip check</code> and performs lightweight import validation.</div>
+  <div class="card"><span class="number">06</span><strong>Report</strong>Returns the Python version, environment path, packages and setup status.</div>
+</div>
+
+<h2>Workflow</h2>
+<div class="flow">
+  <div class="step">Repository path</div><span class="arrow">→</span>
+  <div class="step">Ask environment name</div><span class="arrow">→</span>
+  <div class="step">Detect Python</div><span class="arrow">→</span>
+  <div class="step">Create .venv</div><span class="arrow">→</span>
+  <div class="step">Upgrade pip</div><span class="arrow">→</span>
+  <div class="step">Install requirements</div><span class="arrow">→</span>
+  <div class="step">Install extras</div><span class="arrow">→</span>
+  <div class="step">Validate</div>
+</div>
+
+<h2>Example interaction</h2>
+<pre><code>User:
+Set up the Python environment for:
+C:\Projects\credit-risk-model
+
+Agent:
+What should I name the virtual environment?
+Default: .venv
+
+User:
+risk_env
+
+Agent:
+Do you want to install any additional packages?
+
+User:
+pyarrow, pandera, plotly
+
+Agent:
+Repository validated.
+Python detected: 3.12.6
+Creating:
+C:\Projects\credit-risk-model\risk_env
+
+Installing:
+requirements.txt
+pyarrow
+pandera
+plotly
+
+Running pip check...
+
+✓ Environment created
+✓ Requirements installed
+✓ Additional packages installed
+✓ Dependency check passed
+
+Python:
+C:\Projects\credit-risk-model\risk_env\Scripts\python.exe</code></pre>
+
+<h2>Recommended repository structure</h2>
+<pre><code>credit-risk-model/
+│
+├── .venv/
+├── requirements.txt
+├── src/
+├── tests/
+├── pyproject.toml
+└── README.md</code></pre>
+
+<h2>Typical commands used by the agent</h2>
+<pre><code># Create environment
+python -m venv .venv
+
+# Upgrade packaging tools
+.venv\Scripts\python.exe -m pip install --upgrade pip setuptools wheel
+
+# Install requirements
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+
+# Install additional packages
+.venv\Scripts\python.exe -m pip install pyarrow pandera plotly
+
+# Validate dependencies
+.venv\Scripts\python.exe -m pip check</code></pre>
+
+<h2>Safety behavior</h2>
+<div class="grid">
+  <div class="card">Existing environments are <strong>not deleted automatically.</strong></div>
+  <div class="card">Application source code is <strong>not modified.</strong></div>
+  <div class="card"><code>requirements.txt</code> is <strong>not changed automatically.</strong></div>
+  <div class="card">The environment's own Python is used for <strong>pip operations.</strong></div>
+</div>
+
+<h2>Future extensions</h2>
+<p class="lead">
+  The same agent can later be extended to detect Poetry, uv, Pipenv or Conda,
+  configure the VS Code interpreter, run tests, create a .gitignore entry,
+  generate requirements files, and perform a project smoke test.
+</p>
+
+<footer>
+  Python Environment Setup Agent · Designed for VS Code / GitHub Copilot Agent workflows
+</footer>
+
+</div>
+</body>
+</html>
