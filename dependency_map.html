@@ -1,177 +1,93 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Repository Dependency Explorer</title>
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dependency Explorer — calculate_pd</title>
 <style>
-:root{
-  --bg:#0b0f14; --panel:#111720; --panel2:#151c27; --border:#263142;
-  --text:#e7edf5; --muted:#8492a6; --accent:#7dd3fc; --accent2:#a78bfa;
-  --green:#6ee7b7; --orange:#fbbf24; --pink:#f472b6; --red:#fb7185;
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;overflow:hidden}
-.app{height:100vh;display:grid;grid-template-rows:64px 1fr}
-header{display:flex;align-items:center;gap:16px;padding:10px 18px;background:#0e141d;border-bottom:1px solid var(--border)}
-.logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#7dd3fc,#a78bfa);display:grid;place-items:center;color:#081018;font-weight:900}
-.title{font-weight:750;font-size:15px}.subtitle{font-size:11px;color:var(--muted);margin-top:2px}
-.search{margin-left:20px;flex:1;max-width:600px;background:#090d13;border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);outline:none}
-button{background:#151d29;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 11px;cursor:pointer}
-button:hover{border-color:#52627a;background:#1a2432}
-.body{display:grid;grid-template-columns:230px 1fr 310px;min-height:0}
-.sidebar,.details{background:var(--panel);padding:16px;overflow:auto}
-.sidebar{border-right:1px solid var(--border)}.details{border-left:1px solid var(--border)}
-.section{margin-bottom:22px}.section h3{font-size:10px;letter-spacing:1.2px;color:var(--muted);margin:0 0 10px}
-label{display:flex;gap:8px;align-items:center;font-size:12px;padding:6px 0;color:#cbd5e1}
-input[type=checkbox]{accent-color:#7dd3fc}
-.depth{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.depth button{padding:7px 2px;font-size:10px}
-.depth .active{border-color:var(--accent);color:var(--accent)}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:7px}.stat{background:var(--panel2);border:1px solid var(--border);border-radius:9px;padding:9px}.stat b{font-size:18px}.stat span{display:block;font-size:9px;color:var(--muted);margin-top:3px}
-.canvas{position:relative;background:radial-gradient(circle at 50% 45%,#111b28 0,#0b0f14 62%);overflow:hidden}
-.grid{position:absolute;inset:0;background-image:linear-gradient(#ffffff06 1px,transparent 1px),linear-gradient(90deg,#ffffff06 1px,transparent 1px);background-size:32px 32px}
-.graph{position:absolute;inset:0;transform-origin:0 0}
-.edge{position:absolute;height:2px;transform-origin:left center;background:#607086;opacity:.7}
-.edge:after{content:"";position:absolute;right:-1px;top:-4px;border-left:8px solid #607086;border-top:5px solid transparent;border-bottom:5px solid transparent}
-.edge.calls{background:var(--accent)}.edge.calls:after{border-left-color:var(--accent)}
-.edge.imports{background:var(--green)}.edge.imports:after{border-left-color:var(--green)}
-.edge.uses{background:var(--orange)}.edge.uses:after{border-left-color:var(--orange)}
-.edge.inherits{background:var(--pink)}.edge.inherits:after{border-left-color:var(--pink)}
-.node{position:absolute;width:156px;min-height:58px;padding:10px 11px;border:1px solid #334155;border-radius:10px;background:#121a25;box-shadow:0 8px 30px #0008;cursor:grab;user-select:none}
-.node:hover{border-color:#64748b;transform:translateY(-1px)}
-.node.target{border-color:var(--accent);box-shadow:0 0 0 1px #7dd3fc44,0 12px 35px #0009}
-.node .type{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
-.node .name{font-size:12px;font-weight:700;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.node .file{font-size:9px;color:#64748b;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.node.function .type{color:var(--accent)}.node.class .type{color:var(--pink)}.node.module .type{color:var(--green)}
-.toolbar{position:absolute;right:16px;top:16px;display:flex;gap:5px;z-index:4}
-.hint{position:absolute;bottom:16px;left:16px;color:#64748b;font-size:10px}
-.details h2{font-size:18px;margin:0 0 4px}.badge{display:inline-block;font-size:9px;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
-.kv{font-size:11px;border-top:1px solid var(--border);padding:9px 0}.kv span{display:block;color:var(--muted);font-size:9px;margin-bottom:3px}
-.rel{margin-top:18px}.rel h3{font-size:10px;color:var(--muted);letter-spacing:1px}.rel div{font-size:11px;padding:7px 0;border-bottom:1px solid #1c2532}
-.legend{position:absolute;left:16px;top:16px;background:#0d141dcc;border:1px solid var(--border);border-radius:9px;padding:9px 11px;font-size:9px;color:var(--muted);z-index:3}
-.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px}.c1{background:var(--accent)}.c2{background:var(--green)}.c3{background:var(--orange)}.c4{background:var(--pink)}
-</style>
-</head>
+:root{--bg:#080c12;--panel:#101722;--panel2:#151e2b;--border:#273447;--text:#e8eef6;--muted:#8795aa;--cyan:#67e8f9;--violet:#a78bfa;--green:#6ee7b7;--amber:#fbbf24;--pink:#f472b6}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:13px Inter,system-ui,sans-serif;overflow:hidden}
+header{height:66px;display:flex;align-items:center;gap:13px;padding:11px 18px;border-bottom:1px solid var(--border);background:#0d131c}
+.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--cyan),var(--violet));color:#061018;display:grid;place-items:center;font-weight:900;font-size:19px}
+h1{font-size:15px;margin:0}.sub{color:var(--muted);font-size:10px;margin-top:3px}
+.search{margin-left:25px;flex:1;max-width:600px;background:#090e15;border:1px solid var(--border);color:white;padding:11px 14px;border-radius:10px;outline:none}
+button{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:8px 11px;border-radius:8px;cursor:pointer}
+button:hover{border-color:#64748b}.layout{height:calc(100vh - 66px);display:grid;grid-template-columns:220px 1fr 300px}
+aside{background:var(--panel);padding:16px;overflow:auto}.left{border-right:1px solid var(--border)}.right{border-left:1px solid var(--border)}
+.section{margin-bottom:22px}.section h3{font-size:9px;letter-spacing:1.2px;color:var(--muted);margin:0 0 10px}
+.stat{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1d2735}.stat b{font-size:15px}.stat span{color:var(--muted);font-size:9px}
+.check{display:flex;gap:8px;padding:6px 0;color:#cbd5e1;font-size:11px}input[type=checkbox]{accent-color:var(--cyan)}
+.canvas{position:relative;overflow:hidden;background:radial-gradient(circle at 50% 45%,#121d2c,#080c12 70%)}
+svg{position:absolute;width:100%;height:100%;cursor:grab}svg:active{cursor:grabbing}
+.edge{stroke:#64748b;stroke-width:2;fill:none;opacity:.72}.edge.CALLS{stroke:var(--cyan)}.edge.IMPORTS{stroke:var(--green)}
+.node rect{fill:#121b27;stroke:#334155;stroke-width:1.3}.node.target rect{stroke:var(--cyan);stroke-width:2.5;filter:drop-shadow(0 0 8px #67e8f955)}
+.node text.name{fill:var(--text);font-weight:700;font-size:12px}.node text.type{fill:var(--cyan);font-size:8px;text-transform:uppercase;letter-spacing:1px}.node text.file{fill:#718096;font-size:8px}
+.node.module rect{stroke:var(--green)}.node.module text.type{fill:var(--green)}.node.class rect{stroke:var(--pink)}
+.legend{position:absolute;left:15px;top:15px;background:#0d141de8;border:1px solid var(--border);padding:9px 11px;border-radius:9px;font-size:9px;color:var(--muted)}
+.legend span{margin-right:10px}.c{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px;background:var(--cyan)}.g{background:var(--green)}
+.badge{color:var(--cyan);font-size:9px;letter-spacing:1px;text-transform:uppercase}h2{margin:0 0 3px;font-size:19px}
+.kv{border-top:1px solid var(--border);padding:10px 0;font-size:11px;word-break:break-word}.kv small{display:block;color:var(--muted);font-size:8px;margin-bottom:4px}
+.rel h3{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:20px}.rel div{padding:7px 0;border-bottom:1px solid #1d2735;font-size:10px}
+.hint{position:absolute;bottom:14px;left:15px;color:#59687d;font-size:9px}
+</style></head>
 <body>
-<div class="app">
-<header>
-  <div class="logo">⌘</div>
-  <div><div class="title">Repository Dependency Explorer</div><div class="subtitle">Static analysis • Python repository</div></div>
-  <input class="search" id="search" placeholder="Search functions, classes, modules...">
-  <button onclick="fit()">Fit</button><button onclick="resetView()">Reset</button><button onclick="zoom(1.15)">＋</button><button onclick="zoom(.87)">−</button>
-</header>
-<div class="body">
-<aside class="sidebar">
-  <div class="section"><h3>NODES</h3>
-    <label><input checked type="checkbox"> Functions</label>
-    <label><input checked type="checkbox"> Methods</label>
-    <label><input checked type="checkbox"> Classes</label>
-    <label><input checked type="checkbox"> Modules</label>
-    <label><input type="checkbox"> Files</label>
-  </div>
-  <div class="section"><h3>RELATIONSHIPS</h3>
-    <label><input checked type="checkbox"> Calls</label>
-    <label><input checked type="checkbox"> Imports</label>
-    <label><input checked type="checkbox"> Uses</label>
-    <label><input checked type="checkbox"> Inherits</label>
-  </div>
-  <div class="section"><h3>DEPTH</h3><div class="depth">
-    <button>1</button><button>2</button><button class="active">3</button><button>4</button><button>ALL</button>
-  </div></div>
-  <div class="section"><h3>REPOSITORY</h3><div class="stats">
-    <div class="stat"><b>87</b><span>FILES</span></div>
-    <div class="stat"><b>182</b><span>FUNCTIONS</span></div>
-    <div class="stat"><b>31</b><span>CLASSES</span></div>
-    <div class="stat"><b>394</b><span>RELATIONSHIPS</span></div>
-  </div></div>
+<header><div class="logo">⌘</div><div><h1>Repository Dependency Explorer</h1><div class="sub">3 modules • 30 functions • target: module2.calculate_pd</div></div>
+<input id="search" class="search" placeholder="Search functions, modules, files...">
+<button onclick="fit()">Fit</button><button onclick="resetV()">Reset</button><button onclick="changeZoom(1.15)">＋</button><button onclick="changeZoom(.87)">−</button></header>
+<div class="layout">
+<aside class="left">
+<div class="section"><h3>GRAPH SCOPE</h3>
+<label class="check"><input checked type="checkbox"> Functions</label><label class="check"><input checked type="checkbox"> Modules</label>
+<label class="check"><input checked type="checkbox"> Calls</label><label class="check"><input checked type="checkbox"> Imports</label></div>
+<div class="section"><h3>REPOSITORY</h3>
+<div class="stat"><span>Python files</span><b>3</b></div><div class="stat"><span>Modules</span><b>3</b></div>
+<div class="stat"><span>Functions</span><b>30</b></div><div class="stat"><span>Relationships</span><b>71</b></div></div>
+<div class="section"><h3>DEPTH</h3><button>1</button> <button>2</button> <button style="border-color:var(--cyan)">3</button> <button>ALL</button></div>
 </aside>
-
-<main class="canvas" id="canvas">
-<div class="grid"></div>
-<div class="legend">
-  <div><i class="dot c1"></i>CALLS</div>
-  <div><i class="dot c2"></i>IMPORTS</div>
-  <div><i class="dot c3"></i>USES</div>
-  <div><i class="dot c4"></i>INHERITS</div>
+<main class="canvas" id="canvas"><div class="legend"><span><i class="c"></i> CALLS</span><span><i class="c g"></i> IMPORTS</span></div>
+<svg id="svg" viewBox="0 0 1280 820"><defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#67e8f9"/></marker></defs><g id="world"></g></svg>
+<div class="hint">Scroll = zoom • drag canvas = pan • drag node = move • click = details</div></main>
+<aside class="right" id="details"><h2>calculate_pd</h2><div class="badge">TARGET FUNCTION</div>
+<div class="kv"><small>FILE</small>module2.py</div><div class="kv"><small>SIGNATURE</small>calculate_pd(customer)</div>
+<div class="kv"><small>MODULE</small>module2</div>
+<div class="rel"><h3>CALLEES</h3><div>→ module2.load_risk_factors</div><div>→ module1.get_customer_segment</div></div>
+<div class="rel"><h3>CALLED BY</h3><div>← module2.calculate_expected_loss</div><div>← module3.run_icaap_customer</div></div></aside>
 </div>
-<div class="toolbar"><button onclick="fit()">⌗ Fit Graph</button></div>
-<div class="graph" id="graph"></div>
-<div class="hint">Scroll to zoom • drag canvas to pan • drag nodes to reposition • click a node for details</div>
-</main>
-
-<aside class="details" id="details">
-  <h2>calculate_pd</h2><div class="badge">TARGET FUNCTION</div>
-  <div class="kv"><span>FILE</span>models/pd.py</div>
-  <div class="kv"><span>LINE</span>42–67</div>
-  <div class="kv"><span>MODULE</span>models.pd</div>
-  <div class="kv"><span>SIGNATURE</span>calculate_pd(x, horizon=12)</div>
-  <div class="rel"><h3>CALLERS · 8</h3><div>models.api.predict</div><div>services.icaap.run_pd</div><div>tests.test_pd.test_calculation</div></div>
-  <div class="rel"><h3>CALLEES · 6</h3><div>models.rating.get_rating</div><div>models.curve.discount_factor</div><div>models.validation.validate_pd</div></div>
-</aside>
-</div></div>
-
 <script>
-const graph=document.getElementById('graph'), canvas=document.getElementById('canvas'), search=document.getElementById('search');
-const nodes=[
-{id:'api',name:'predict',type:'function',file:'models/api.py',x:360,y:105},
-{id:'target',name:'calculate_pd',type:'function',file:'models/pd.py',x:590,y:235,target:true},
-{id:'rating',name:'get_rating',type:'function',file:'models/rating.py',x:335,y:400},
-{id:'curve',name:'discount_factor',type:'function',file:'models/curve.py',x:585,y:445},
-{id:'validation',name:'validate_pd',type:'function',file:'models/validation.py',x:830,y:400},
-{id:'icaap',name:'run_pd',type:'function',file:'services/icaap.py',x:840,y:105},
-{id:'pdmodel',name:'PDModel',type:'class',file:'models/pd_model.py',x:1020,y:245},
-{id:'module',name:'models.pd',type:'module',file:'models/pd.py',x:1080,y:440}
-];
-const edges=[
-['api','target','calls'],['icaap','target','calls'],['target','rating','calls'],
-['target','curve','calls'],['target','validation','calls'],['pdmodel','target','uses'],
-['module','target','defines']
-];
-let scale=1, ox=0, oy=0;
+const DATA={"nodes": [{"id": "module1.get_customer_segment", "type": "function", "name": "get_customer_segment", "file": "module1.py", "module": "module1", "line": 12, "signature": "get_customer_segment(customer)", "x": 1120, "y": 100}, {"id": "module1.calculate_customer_score", "type": "function", "name": "calculate_customer_score", "file": "module1.py", "module": "module1", "line": 15, "signature": "calculate_customer_score(customer)", "x": 870, "y": 300}, {"id": "module1.enrich_customer", "type": "function", "name": "enrich_customer", "file": "module1.py", "module": "module1", "line": 18, "signature": "enrich_customer(customer)", "x": 610, "y": 300}, {"id": "module1.customer_snapshot", "type": "function", "name": "customer_snapshot", "file": "module1.py", "module": "module1", "line": 23, "signature": "customer_snapshot(customer_id)", "x": 350, "y": 300}, {"id": "module3.prepare_customer", "type": "function", "name": "prepare_customer", "file": "module3.py", "module": "module3", "line": 6, "signature": "prepare_customer(customer_id)", "x": 80, "y": 300}, {"id": "module3.calculate_capital_charge", "type": "function", "name": "calculate_capital_charge", "file": "module3.py", "module": "module3", "line": 9, "signature": "calculate_capital_charge(customer)", "x": 350, "y": 100}, {"id": "module3.run_icaap_customer", "type": "function", "name": "run_icaap_customer", "file": "module3.py", "module": "module3", "line": 23, "signature": "run_icaap_customer(customer_id)", "x": 80, "y": 100}, {"id": "module2.load_risk_factors", "type": "function", "name": "load_risk_factors", "file": "module2.py", "module": "module2", "line": 5, "signature": "load_risk_factors(customer)", "x": 870, "y": 100}, {"id": "module2.calculate_pd", "type": "function", "name": "calculate_pd", "file": "module2.py", "module": "module2", "line": 8, "signature": "calculate_pd(customer)", "x": 610, "y": 100}, {"id": "module2.calculate_expected_loss", "type": "function", "name": "calculate_expected_loss", "file": "module2.py", "module": "module2", "line": 22, "signature": "calculate_expected_loss(customer)", "x": 610, "y": 500}, {"id": "module2.build_risk_profile", "type": "function", "name": "build_risk_profile", "file": "module2.py", "module": "module2", "line": 32, "signature": "build_risk_profile(customer)", "x": 870, "y": 500}, {"id": "module2.customer_risk_snapshot", "type": "function", "name": "customer_risk_snapshot", "file": "module2.py", "module": "module2", "line": 39, "signature": "customer_risk_snapshot(customer_id)", "x": 350, "y": 500}, {"id": "module1", "type": "module", "name": "module1", "file": "module1.py", "module": "module1", "x": 1120, "y": 500}, {"id": "module3", "type": "module", "name": "module3", "file": "module3.py", "module": "module3", "x": 80, "y": 700}, {"id": "module2", "type": "module", "name": "module2", "file": "module2.py", "module": "module2", "x": 350, "y": 700}], "edges": [{"source": "module1.enrich_customer", "target": "module1.calculate_customer_score", "type": "CALLS"}, {"source": "module1.customer_snapshot", "target": "module1.enrich_customer", "type": "CALLS"}, {"source": "module3", "target": "module1.customer_snapshot", "type": "IMPORTS"}, {"source": "module3", "target": "module2.calculate_pd", "type": "IMPORTS"}, {"source": "module3", "target": "module2.calculate_expected_loss", "type": "IMPORTS"}, {"source": "module3", "target": "module2.build_risk_profile", "type": "IMPORTS"}, {"source": "module3.prepare_customer", "target": "module1.customer_snapshot", "type": "CALLS"}, {"source": "module3.calculate_capital_charge", "target": "module2.calculate_expected_loss", "type": "CALLS"}, {"source": "module3.run_icaap_customer", "target": "module3.prepare_customer", "type": "CALLS"}, {"source": "module3.run_icaap_customer", "target": "module3.calculate_capital_charge", "type": "CALLS"}, {"source": "module3.run_icaap_customer", "target": "module2.calculate_pd", "type": "CALLS"}, {"source": "module2", "target": "module1.customer_snapshot", "type": "IMPORTS"}, {"source": "module2", "target": "module1.get_customer_segment", "type": "IMPORTS"}, {"source": "module2.calculate_pd", "target": "module1.get_customer_segment", "type": "CALLS"}, {"source": "module2.calculate_pd", "target": "module2.load_risk_factors", "type": "CALLS"}, {"source": "module2.calculate_expected_loss", "target": "module2.calculate_pd", "type": "CALLS"}, {"source": "module2.build_risk_profile", "target": "module2.calculate_pd", "type": "CALLS"}, {"source": "module2.customer_risk_snapshot", "target": "module1.customer_snapshot", "type": "CALLS"}, {"source": "module2.customer_risk_snapshot", "target": "module2.build_risk_profile", "type": "CALLS"}], "target": "module2.calculate_pd", "stats": {"python_files": 3, "modules": 3, "functions": 30, "relationships": 71}};
+const svg=document.getElementById('svg'), world=document.getElementById('world'), canvas=document.getElementById('canvas');
+let scale=1,tx=0,ty=0,dragWorld=null,dragNode=null;
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function render(){
- graph.innerHTML='';
- edges.forEach(e=>{
-   const a=nodes.find(n=>n.id===e[0]),b=nodes.find(n=>n.id===e[1]);
-   const el=document.createElement('div'); el.className='edge '+e[2];
-   const x=a.x+78,y=a.y+29,dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy);
-   el.style.left=x+'px';el.style.top=y+'px';el.style.width=len+'px';el.style.transform=`rotate(${Math.atan2(dy,dx)}rad)`;
-   graph.appendChild(el);
+ world.innerHTML='';
+ DATA.edges.forEach((e,i)=>{
+   const a=DATA.nodes.find(n=>n.id===e.source),b=DATA.nodes.find(n=>n.id===e.target); if(!a||!b)return;
+   const x1=a.x+76,y1=a.y+30,x2=b.x+76,y2=b.y+30;
+   const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+   line.setAttribute('x1',x1);line.setAttribute('y1',y1);line.setAttribute('x2',x2);line.setAttribute('y2',y2);
+   line.setAttribute('class','edge '+e.type);line.setAttribute('marker-end','url(#arrow)');world.appendChild(line);
  });
- nodes.forEach(n=>{
-   const el=document.createElement('div');el.className=`node ${n.type}${n.target?' target':''}`;
-   el.dataset.name=n.name.toLowerCase();
-   el.style.left=n.x+'px';el.style.top=n.y+'px';
-   el.innerHTML=`<div class="type">${n.type}</div><div class="name">${n.name}</div><div class="file">${n.file}</div>`;
-   el.onclick=()=>select(n);
-   el.onmousedown=e=>dragNode(e,n);
-   graph.appendChild(el);
+ DATA.nodes.forEach(n=>{
+   const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.classList.add('node',n.type);if(n.id===DATA.target)g.classList.add('target');
+   g.dataset.name=(n.name+' '+n.file+' '+n.module).toLowerCase();g.setAttribute('transform',`translate(${n.x},${n.y})`);
+   g.innerHTML=`<rect width="152" height="60" rx="10"></rect><text class="type" x="10" y="15">${esc(n.type)}</text><text class="name" x="10" y="33">${esc(n.name)}</text><text class="file" x="10" y="49">${esc(n.file)}</text>`;
+   g.onclick=()=>select(n);g.onmousedown=e=>startNode(e,n);world.appendChild(g);
  });
- graph.style.transform=`translate(${ox}px,${oy}px) scale(${scale})`;
+ world.setAttribute('transform',`translate(${tx},${ty}) scale(${scale})`);
 }
 function select(n){
- document.getElementById('details').innerHTML=`<h2>${n.name}</h2><div class="badge">${n.target?'TARGET ':''}${n.type}</div>
- <div class="kv"><span>FILE</span>${n.file}</div><div class="kv"><span>MODULE</span>${n.file.replace('.py','').replaceAll('/','.')}</div>
- <div class="kv"><span>STATUS</span>Static analysis result</div>
- <div class="rel"><h3>CONNECTED</h3>${edges.filter(e=>e[0]===n.id||e[1]===n.id).map(e=>`<div>${e[0]===n.id?'→ '+e[1]:'← '+e[0]} · ${e[2].toUpperCase()}</div>`).join('')}</div>`;
+ const incoming=DATA.edges.filter(e=>e.target===n.id),out=DATA.edges.filter(e=>e.source===n.id);
+ document.getElementById('details').innerHTML=`<h2>${esc(n.name)}</h2><div class="badge">${n.id===DATA.target?'TARGET ':''}${esc(n.type)}</div>
+ <div class="kv"><small>FILE</small>${esc(n.file)}</div><div class="kv"><small>MODULE</small>${esc(n.module)}</div>
+ <div class="kv"><small>LINE</small>${n.line||'—'}</div>
+ <div class="rel"><h3>OUTGOING · ${out.length}</h3>${out.map(e=>'<div>→ '+esc(e.target)+' · '+e.type+'</div>').join('')||'<div>None</div>'}</div>
+ <div class="rel"><h3>INCOMING · ${incoming.length}</h3>${incoming.map(e=>'<div>← '+esc(e.source)+' · '+e.type+'</div>').join('')||'<div>None</div>'}</div>`;
 }
-function zoom(z){scale=Math.max(.35,Math.min(2.5,scale*z));render()}
-function resetView(){scale=1;ox=0;oy=0;render()}
-function fit(){scale=.72;ox=40;oy=25;render()}
-let drag=null;
-function dragNode(e,n){
- e.stopPropagation();const sx=e.clientX,sy=e.clientY,ox0=n.x,oy0=n.y;
- const move=ev=>{n.x=ox0+(ev.clientX-sx)/scale;n.y=oy0+(ev.clientY-sy)/scale;render()};
- const up=()=>{window.removeEventListener('mousemove',move);window.removeEventListener('mouseup',up)};
- window.addEventListener('mousemove',move);window.addEventListener('mouseup',up);
-}
-let pan=null;
-canvas.onmousedown=e=>{if(e.target!==canvas&& !e.target.classList.contains('grid'))return;pan={x:e.clientX,y:e.clientY,ox,oy}};
-window.addEventListener('mousemove',e=>{if(!pan)return;ox+=e.clientX-pan.x;oy+=e.clientY-pan.y;pan.x=e.clientX;pan.y=e.clientY;render()});
-window.addEventListener('mouseup',()=>pan=null);
-canvas.onwheel=e=>{e.preventDefault();zoom(e.deltaY<0?1.08:.92)};
-search.oninput=()=>{const q=search.value.toLowerCase();document.querySelectorAll('.node').forEach(el=>el.style.opacity=(!q||el.dataset.name.includes(q))?'1':'.18')};
+function changeZoom(z){scale=Math.max(.4,Math.min(2.5,scale*z));render()}
+function resetV(){scale=1;tx=0;ty=0;render()}
+function fit(){scale=.72;tx=35;ty=25;render()}
+function startNode(e,n){e.stopPropagation();dragNode={n,sx:e.clientX,sy:e.clientY,x:n.x,y:n.y}}
+canvas.onmousedown=e=>{if(e.target===svg||e.target.tagName==='svg')dragWorld={sx:e.clientX,sy:e.clientY,tx,ty}};
+window.onmousemove=e=>{if(dragNode){dragNode.n.x=dragNode.x+(e.clientX-dragNode.sx)/scale;dragNode.n.y=dragNode.y+(e.clientY-dragNode.sy)/scale;render()}else if(dragWorld){tx=dragWorld.tx+e.clientX-dragWorld.sx;ty=dragWorld.ty+e.clientY-dragWorld.sy;render()}};
+window.onmouseup=()=>{dragNode=null;dragWorld=null};
+canvas.onwheel=e=>{e.preventDefault();changeZoom(e.deltaY<0?1.08:.92)};
+document.getElementById('search').oninput=e=>{const q=e.target.value.toLowerCase();document.querySelectorAll('.node').forEach(n=>n.style.opacity=!q||n.dataset.name.includes(q)?1:.14)};
 render();
-</script>
-</body>
-</html>
+</script></body></html>
