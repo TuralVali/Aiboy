@@ -1,0 +1,106 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dependency Explorer — calculate_pd</title>
+<style>
+:root{--bg:#080c12;--panel:#101722;--panel2:#151e2b;--border:#273447;--text:#e8eef6;--muted:#8795aa;--cyan:#67e8f9;--violet:#a78bfa;--green:#6ee7b7;--amber:#fbbf24;--pink:#f472b6}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:13px Inter,system-ui,sans-serif;overflow:hidden}
+header{height:66px;display:flex;align-items:center;gap:13px;padding:11px 18px;border-bottom:1px solid var(--border);background:#0d131c}
+.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--cyan),var(--violet));color:#061018;display:grid;place-items:center;font-weight:900;font-size:19px}
+h1{font-size:15px;margin:0}.sub{color:var(--muted);font-size:10px;margin-top:3px}
+.search{margin-left:25px;flex:1;max-width:600px;background:#090e15;border:1px solid var(--border);color:white;padding:11px 14px;border-radius:10px;outline:none}
+button{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:8px 11px;border-radius:8px;cursor:pointer}
+button:hover{border-color:#64748b}.layout{height:calc(100vh - 66px);display:grid;grid-template-columns:220px 1fr 300px}
+aside{background:var(--panel);padding:16px;overflow:auto}.left{border-right:1px solid var(--border)}.right{border-left:1px solid var(--border)}
+.section{margin-bottom:22px}.section h3{font-size:9px;letter-spacing:1.2px;color:var(--muted);margin:0 0 10px}
+.stat{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1d2735}.stat b{font-size:15px}.stat span{color:var(--muted);font-size:9px}
+.check{display:flex;gap:8px;padding:6px 0;color:#cbd5e1;font-size:11px}input[type=checkbox]{accent-color:var(--cyan)}
+.canvas{position:relative;overflow:hidden;background:radial-gradient(circle at 50% 45%,#121d2c,#080c12 70%)}
+svg{position:absolute;width:100%;height:100%;cursor:grab}svg:active{cursor:grabbing}
+.edge{stroke:#64748b;stroke-width:2;fill:none;opacity:.72}.edge.CALLS{stroke:var(--cyan)}.edge.IMPORTS{stroke:var(--green)}
+.node rect{fill:#121b27;stroke:#334155;stroke-width:1.3}.node.selected rect{stroke:#ffffff;stroke-width:2.5}.node.target rect{stroke:var(--cyan);stroke-width:2.5;filter:drop-shadow(0 0 8px #67e8f955)}
+.node text.name{fill:var(--text);font-weight:700;font-size:12px}.node text.type{fill:var(--cyan);font-size:8px;text-transform:uppercase;letter-spacing:1px}.node text.file{fill:#718096;font-size:8px}
+.node.module rect{stroke:var(--green)}.node.module text.type{fill:var(--green)}.node.class rect{stroke:var(--pink)}
+.legend{position:absolute;left:15px;top:15px;background:#0d141de8;border:1px solid var(--border);padding:9px 11px;border-radius:9px;font-size:9px;color:var(--muted)}
+.legend span{margin-right:10px}.c{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px;background:var(--cyan)}.g{background:var(--green)}
+.badge{color:var(--cyan);font-size:9px;letter-spacing:1px;text-transform:uppercase}h2{margin:0 0 3px;font-size:19px}
+.kv{border-top:1px solid var(--border);padding:10px 0;font-size:11px;word-break:break-word}.kv small{display:block;color:var(--muted);font-size:8px;margin-bottom:4px}
+.rel h3{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:20px}.rel div{padding:7px 0;border-bottom:1px solid #1d2735;font-size:10px}
+.hint{position:absolute;bottom:14px;left:15px;color:#59687d;font-size:9px}
+</style></head>
+<body>
+<header><div class="logo">⌘</div><div><h1>Repository Dependency Explorer</h1><div class="sub">3 modules • 30 functions • target: module2.calculate_pd</div></div>
+<input id="search" class="search" placeholder="Search functions, modules, files...">
+<button onclick="fit()">Fit</button><button onclick="resetV()">Reset</button><button onclick="changeZoom(1.15)">＋</button><button onclick="changeZoom(.87)">−</button></header>
+<div class="layout">
+<aside class="left">
+<div class="section"><h3>GRAPH SCOPE</h3>
+<label class="check"><input checked type="checkbox"> Functions</label><label class="check"><input checked type="checkbox"> Modules</label>
+<label class="check"><input checked type="checkbox"> Calls</label><label class="check"><input checked type="checkbox"> Imports</label></div>
+<div class="section"><h3>REPOSITORY</h3>
+<div class="stat"><span>Python files</span><b>3</b></div><div class="stat"><span>Modules</span><b>3</b></div>
+<div class="stat"><span>Functions</span><b>30</b></div><div class="stat"><span>Relationships</span><b>71</b></div></div>
+<div class="section"><h3>DEPTH</h3><button>1</button> <button>2</button> <button style="border-color:var(--cyan)">3</button> <button>ALL</button></div>
+</aside>
+<main class="canvas" id="canvas"><div class="legend"><span><i class="c"></i> CALLS</span><span><i class="c g"></i> IMPORTS</span></div>
+<svg id="svg" viewBox="0 0 1280 820" preserveAspectRatio="xMidYMid meet"><defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#67e8f9"/></marker></defs><g id="world"><line class="edge CALLS" x1="686" y1="330" x2="946" y2="330" marker-end="url(#arrow)"/>
+<line class="edge CALLS" x1="426" y1="330" x2="686" y2="330" marker-end="url(#arrow)"/>
+<line class="edge IMPORTS" x1="156" y1="730" x2="426" y2="330" marker-end="url(#arrow)"/>
+<line class="edge IMPORTS" x1="156" y1="730" x2="686" y2="130" marker-end="url(#arrow)"/>
+<line class="edge IMPORTS" x1="156" y1="730" x2="686" y2="530" marker-end="url(#arrow)"/>
+<line class="edge IMPORTS" x1="156" y1="730" x2="946" y2="530" marker-end="url(#arrow)"/>
+<line class="edge CALLS" x1="156" y1="330" x2="426" y2="330" marker-end="url(#arrow)"/>
+<line class="edge CALLS" x1="426" y1="130" x2="686" y2="530" marker-end="url(#arrow)"/>
+<line class="edge CALLS" x1="156" y1="130" x2="156" y2="330" marker-end="url(#arrow)"/>
+<line class="edge CALLS" x1="156" y1="130" x2="426" y2="130" marker-end="url(#arrow)"/>
+<line class="edge CALLS" x1="156" y1="130" x2="686" y2="130" marker-end="url(#arrow)"/>
+<line class="edge IMPORTS" x1="426" y1="730" x2="426" y2="330" marker-end="url(#arrow)"/>
+<line class="edge IMPORTS" x1="426" y1="730" x2="1196" y2="130" marker-end="url(#arrow)"/>
+<line class="edge CALLS" x1="686" y1="130" x2="1196" y2="130" marker-end="url(#arrow)"/>
+<line class="edge CALLS" x1="686" y1="130" x2="946" y2="130" marker-end="url(#arrow)"/>
+<line class="edge CALLS" x1="686" y1="530" x2="686" y2="130" marker-end="url(#arrow)"/>
+<line class="edge CALLS" x1="946" y1="530" x2="686" y2="130" marker-end="url(#arrow)"/>
+<line class="edge CALLS" x1="426" y1="530" x2="426" y2="330" marker-end="url(#arrow)"/>
+<line class="edge CALLS" x1="426" y1="530" x2="946" y2="530" marker-end="url(#arrow)"/>
+<g class="node function" data-id="module1.get_customer_segment" data-name="get_customer_segment module1.py module1" transform="translate(1120,100)"><rect width="152" height="60" rx="10"/><text class="type" x="10" y="15">function</text><text class="name" x="10" y="33">get_customer_segment</text><text class="file" x="10" y="49">module1.py</text></g>
+<g class="node function" data-id="module1.calculate_customer_score" data-name="calculate_customer_score module1.py module1" transform="translate(870,300)"><rect width="152" height="60" rx="10"/><text class="type" x="10" y="15">function</text><text class="name" x="10" y="33">calculate_customer_score</text><text class="file" x="10" y="49">module1.py</text></g>
+<g class="node function" data-id="module1.enrich_customer" data-name="enrich_customer module1.py module1" transform="translate(610,300)"><rect width="152" height="60" rx="10"/><text class="type" x="10" y="15">function</text><text class="name" x="10" y="33">enrich_customer</text><text class="file" x="10" y="49">module1.py</text></g>
+<g class="node function" data-id="module1.customer_snapshot" data-name="customer_snapshot module1.py module1" transform="translate(350,300)"><rect width="152" height="60" rx="10"/><text class="type" x="10" y="15">function</text><text class="name" x="10" y="33">customer_snapshot</text><text class="file" x="10" y="49">module1.py</text></g>
+<g class="node function" data-id="module3.prepare_customer" data-name="prepare_customer module3.py module3" transform="translate(80,300)"><rect width="152" height="60" rx="10"/><text class="type" x="10" y="15">function</text><text class="name" x="10" y="33">prepare_customer</text><text class="file" x="10" y="49">module3.py</text></g>
+<g class="node function" data-id="module3.calculate_capital_charge" data-name="calculate_capital_charge module3.py module3" transform="translate(350,100)"><rect width="152" height="60" rx="10"/><text class="type" x="10" y="15">function</text><text class="name" x="10" y="33">calculate_capital_charge</text><text class="file" x="10" y="49">module3.py</text></g>
+<g class="node function" data-id="module3.run_icaap_customer" data-name="run_icaap_customer module3.py module3" transform="translate(80,100)"><rect width="152" height="60" rx="10"/><text class="type" x="10" y="15">function</text><text class="name" x="10" y="33">run_icaap_customer</text><text class="file" x="10" y="49">module3.py</text></g>
+<g class="node function" data-id="module2.load_risk_factors" data-name="load_risk_factors module2.py module2" transform="translate(870,100)"><rect width="152" height="60" rx="10"/><text class="type" x="10" y="15">function</text><text class="name" x="10" y="33">load_risk_factors</text><text class="file" x="10" y="49">module2.py</text></g>
+<g class="node function target" data-id="module2.calculate_pd" data-name="calculate_pd module2.py module2" transform="translate(610,100)"><rect width="152" height="60" rx="10"/><text class="type" x="10" y="15">function</text><text class="name" x="10" y="33">calculate_pd</text><text class="file" x="10" y="49">module2.py</text></g>
+<g class="node function" data-id="module2.calculate_expected_loss" data-name="calculate_expected_loss module2.py module2" transform="translate(610,500)"><rect width="152" height="60" rx="10"/><text class="type" x="10" y="15">function</text><text class="name" x="10" y="33">calculate_expected_loss</text><text class="file" x="10" y="49">module2.py</text></g>
+<g class="node function" data-id="module2.build_risk_profile" data-name="build_risk_profile module2.py module2" transform="translate(870,500)"><rect width="152" height="60" rx="10"/><text class="type" x="10" y="15">function</text><text class="name" x="10" y="33">build_risk_profile</text><text class="file" x="10" y="49">module2.py</text></g>
+<g class="node function" data-id="module2.customer_risk_snapshot" data-name="customer_risk_snapshot module2.py module2" transform="translate(350,500)"><rect width="152" height="60" rx="10"/><text class="type" x="10" y="15">function</text><text class="name" x="10" y="33">customer_risk_snapshot</text><text class="file" x="10" y="49">module2.py</text></g>
+<g class="node module" data-id="module1" data-name="module1 module1.py module1" transform="translate(1120,500)"><rect width="152" height="60" rx="10"/><text class="type" x="10" y="15">module</text><text class="name" x="10" y="33">module1</text><text class="file" x="10" y="49">module1.py</text></g>
+<g class="node module" data-id="module3" data-name="module3 module3.py module3" transform="translate(80,700)"><rect width="152" height="60" rx="10"/><text class="type" x="10" y="15">module</text><text class="name" x="10" y="33">module3</text><text class="file" x="10" y="49">module3.py</text></g>
+<g class="node module" data-id="module2" data-name="module2 module2.py module2" transform="translate(350,700)"><rect width="152" height="60" rx="10"/><text class="type" x="10" y="15">module</text><text class="name" x="10" y="33">module2</text><text class="file" x="10" y="49">module2.py</text></g></g></svg>
+<div class="hint">Scroll = zoom • drag canvas = pan • drag node = move • click = details</div></main>
+<aside class="right" id="details"><h2>calculate_pd</h2><div class="badge">TARGET FUNCTION</div>
+<div class="kv"><small>FILE</small>module2.py</div><div class="kv"><small>SIGNATURE</small>calculate_pd(customer)</div>
+<div class="kv"><small>MODULE</small>module2</div>
+<div class="rel"><h3>CALLEES</h3><div>→ module2.load_risk_factors</div><div>→ module1.get_customer_segment</div></div>
+<div class="rel"><h3>CALLED BY</h3><div>← module2.calculate_expected_loss</div><div>← module3.run_icaap_customer</div></div></aside>
+</div>
+<script>
+const DATA={"nodes":[{"id":"module1.get_customer_segment","type":"function","name":"get_customer_segment","file":"module1.py","module":"module1","line":12,"signature":"get_customer_segment(customer)","x":1120,"y":100},{"id":"module1.calculate_customer_score","type":"function","name":"calculate_customer_score","file":"module1.py","module":"module1","line":15,"signature":"calculate_customer_score(customer)","x":870,"y":300},{"id":"module1.enrich_customer","type":"function","name":"enrich_customer","file":"module1.py","module":"module1","line":18,"signature":"enrich_customer(customer)","x":610,"y":300},{"id":"module1.customer_snapshot","type":"function","name":"customer_snapshot","file":"module1.py","module":"module1","line":23,"signature":"customer_snapshot(customer_id)","x":350,"y":300},{"id":"module3.prepare_customer","type":"function","name":"prepare_customer","file":"module3.py","module":"module3","line":6,"signature":"prepare_customer(customer_id)","x":80,"y":300},{"id":"module3.calculate_capital_charge","type":"function","name":"calculate_capital_charge","file":"module3.py","module":"module3","line":9,"signature":"calculate_capital_charge(customer)","x":350,"y":100},{"id":"module3.run_icaap_customer","type":"function","name":"run_icaap_customer","file":"module3.py","module":"module3","line":23,"signature":"run_icaap_customer(customer_id)","x":80,"y":100},{"id":"module2.load_risk_factors","type":"function","name":"load_risk_factors","file":"module2.py","module":"module2","line":5,"signature":"load_risk_factors(customer)","x":870,"y":100},{"id":"module2.calculate_pd","type":"function","name":"calculate_pd","file":"module2.py","module":"module2","line":8,"signature":"calculate_pd(customer)","x":610,"y":100},{"id":"module2.calculate_expected_loss","type":"function","name":"calculate_expected_loss","file":"module2.py","module":"module2","line":22,"signature":"calculate_expected_loss(customer)","x":610,"y":500},{"id":"module2.build_risk_profile","type":"function","name":"build_risk_profile","file":"module2.py","module":"module2","line":32,"signature":"build_risk_profile(customer)","x":870,"y":500},{"id":"module2.customer_risk_snapshot","type":"function","name":"customer_risk_snapshot","file":"module2.py","module":"module2","line":39,"signature":"customer_risk_snapshot(customer_id)","x":350,"y":500},{"id":"module1","type":"module","name":"module1","file":"module1.py","module":"module1","x":1120,"y":500},{"id":"module3","type":"module","name":"module3","file":"module3.py","module":"module3","x":80,"y":700},{"id":"module2","type":"module","name":"module2","file":"module2.py","module":"module2","x":350,"y":700}],"edges":[{"source":"module1.enrich_customer","target":"module1.calculate_customer_score","type":"CALLS"},{"source":"module1.customer_snapshot","target":"module1.enrich_customer","type":"CALLS"},{"source":"module3","target":"module1.customer_snapshot","type":"IMPORTS"},{"source":"module3","target":"module2.calculate_pd","type":"IMPORTS"},{"source":"module3","target":"module2.calculate_expected_loss","type":"IMPORTS"},{"source":"module3","target":"module2.build_risk_profile","type":"IMPORTS"},{"source":"module3.prepare_customer","target":"module1.customer_snapshot","type":"CALLS"},{"source":"module3.calculate_capital_charge","target":"module2.calculate_expected_loss","type":"CALLS"},{"source":"module3.run_icaap_customer","target":"module3.prepare_customer","type":"CALLS"},{"source":"module3.run_icaap_customer","target":"module3.calculate_capital_charge","type":"CALLS"},{"source":"module3.run_icaap_customer","target":"module2.calculate_pd","type":"CALLS"},{"source":"module2","target":"module1.customer_snapshot","type":"IMPORTS"},{"source":"module2","target":"module1.get_customer_segment","type":"IMPORTS"},{"source":"module2.calculate_pd","target":"module1.get_customer_segment","type":"CALLS"},{"source":"module2.calculate_pd","target":"module2.load_risk_factors","type":"CALLS"},{"source":"module2.calculate_expected_loss","target":"module2.calculate_pd","type":"CALLS"},{"source":"module2.build_risk_profile","target":"module2.calculate_pd","type":"CALLS"},{"source":"module2.customer_risk_snapshot","target":"module1.customer_snapshot","type":"CALLS"},{"source":"module2.customer_risk_snapshot","target":"module2.build_risk_profile","type":"CALLS"}],"target":"module2.calculate_pd","stats":{"python_files":3,"modules":3,"functions":30,"relationships":71}};
+const svg=document.getElementById('svg'), world=document.getElementById('world'), canvas=document.getElementById('canvas');
+let scale=1,tx=0,ty=0,pan=null,selected=null;
+function apply(){world.setAttribute('transform',`translate(${tx},${ty}) scale(${scale})`)}
+function select(n){
+ selected=n.id;
+ document.querySelectorAll('.node').forEach(x=>x.classList.toggle('selected',x.dataset.id===n.id));
+ const incoming=DATA.edges.filter(e=>e.target===n.id), out=DATA.edges.filter(e=>e.source===n.id);
+ document.getElementById('details').innerHTML=`<h2>${n.name}</h2><div class="badge">${n.id===DATA.target?'TARGET ':''}${n.type}</div><div class="kv"><small>FILE</small>${n.file}</div><div class="kv"><small>MODULE</small>${n.module}</div><div class="kv"><small>LINE</small>${n.line||'—'}</div><div class="kv"><small>SIGNATURE</small>${n.signature||'—'}</div><div class="rel"><h3>OUTGOING · ${out.length}</h3>${out.map(e=>`<div>→ ${e.target} · ${e.type}</div>`).join('')||'<div>None</div>'}</div><div class="rel"><h3>INCOMING · ${incoming.length}</h3>${incoming.map(e=>`<div>← ${e.source} · ${e.type}</div>`).join('')||'<div>None</div>'}</div>`;
+}
+function changeZoom(z){scale=Math.max(.45,Math.min(2.4,scale*z));apply()}
+function resetV(){scale=1;tx=0;ty=0;apply()}
+function fit(){scale=.78;tx=20;ty=10;apply()}
+document.querySelectorAll('.node').forEach(el=>{el.addEventListener('click',e=>{e.stopPropagation();const n=DATA.nodes.find(x=>x.id===el.dataset.id);select(n)});el.addEventListener('mousedown',e=>{e.stopPropagation()})});
+canvas.addEventListener('mousedown',e=>{if(e.target===svg||e.target.id==='world'){pan={x:e.clientX,y:e.clientY,tx,ty}}});
+window.addEventListener('mousemove',e=>{if(pan){tx=pan.tx+e.clientX-pan.x;ty=pan.ty+e.clientY-pan.y;apply()}});window.addEventListener('mouseup',()=>pan=null);
+canvas.addEventListener('wheel',e=>{e.preventDefault();changeZoom(e.deltaY<0?1.08:.92)},{passive:false});
+document.getElementById('search').addEventListener('input',e=>{const q=e.target.value.toLowerCase();document.querySelectorAll('.node').forEach(n=>n.style.opacity=(!q||n.dataset.name.toLowerCase().includes(q))?'1':'.12')});
+apply();
+</script></body></html>
